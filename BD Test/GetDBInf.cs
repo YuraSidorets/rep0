@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using MySql.Data.MySqlClient;
+using System.IO;
 
 namespace BD_Test
 {
@@ -43,6 +44,7 @@ namespace BD_Test
                 }
             }
         }
+
         public static void GetData()
         {
             DataTable dt = new DataTable();
@@ -86,6 +88,40 @@ namespace BD_Test
             }
 
 
+        }
+
+        public static Dictionary<string, string> GetFileInfo(string path)
+        {
+            Dictionary<string, string> fileInformation = new Dictionary<string, string>();
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            fileInformation.Add("FileName", fileName);
+
+            string fileType = Path.GetExtension(path);
+            fileInformation.Add("FileType", fileType);
+
+            DateTime fileCreationDate = File.GetCreationTime(path);
+            fileInformation.Add("FileCreationDate", fileCreationDate.ToString());
+
+            FileInfo fi = new FileInfo(path);
+            double fileSize = fi.Length;
+            fileInformation.Add("FileSize", fileSize.ToString());
+
+            return fileInformation;
+        }
+
+        public static byte[] GetBytes(string path)
+        {
+            byte[] output = null;
+            try
+            {
+                output = File.ReadAllBytes(path);
+            }
+            catch(IOException e)
+            {
+                Console.WriteLine("this file does not exist\nmethod will return null");
+            }
+            return output;
+            
         }
     }
 }

@@ -10,8 +10,20 @@ namespace BD_Test
     {
         static void Main(string[] args)
         {
-            GetDBInf.GetData();
-          
+            Dictionary<string, string> dict = GetDBInf.GetFileInfo(@"E:\1.txt");
+            foreach (KeyValuePair<string,string> pair in dict)
+            {
+                Console.WriteLine("{0}--{1}", pair.Key, pair.Value);
+            }
+            Console.WriteLine(new string('-', 20));
+
+            byte[] b = GetDBInf.GetBytes(@"E:\1.txt");
+            foreach (byte bt in b)
+            {
+                Console.Write(bt);
+            }
+            Console.ReadKey();
         }
+        
     }
 }
