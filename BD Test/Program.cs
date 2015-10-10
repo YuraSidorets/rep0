@@ -21,9 +21,8 @@ namespace DB_Test
             DBWorker worker = new DBWorker(mysqlCSB);
             Dictionary<string, string> a = FileWorker.GetFileInfo(@"F:\111\avstralia.jpg");
 
-            worker.SetValue("new_table",a.Keys.ToArray()[0],a.Values.ToArray()[0
-                ]);
-            
+            worker.SetValue(@"F:\Backup\Music\Turbowolf\Turbowolf_-_Two_Hands_2015\01 - Invisible Hand.mp3", "new_table");
+
         }
     }
 }

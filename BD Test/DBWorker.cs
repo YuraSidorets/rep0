@@ -26,9 +26,18 @@ namespace DB_Test
         }
 
 
-        public void SetValue(string table, string column, string value)
+        public void SetValue(string filePath, string table)
         {
-            string queryString = String.Format(@"INSERT INTO {0} ({1}) VALUES ('{2}')", table, column, value);
+            string queryString = String.Format(@"INSERT INTO {0} ({1},{2},{3},{4}) VALUES ('{5}','{6}','{7}','{8}')",
+
+                table,FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1], 
+                FileWorker.GetFileInfo(filePath).Keys.ToArray()[2], FileWorker.GetFileInfo(filePath).Keys.ToArray()[3],
+
+                FileWorker.GetFileInfo(filePath).Values.ToArray()[0], FileWorker.GetFileInfo(filePath).Values.ToArray()[1],
+                FileWorker.GetFileInfo(filePath).Values.ToArray()[2], FileWorker.GetFileInfo(filePath).Values.ToArray()[3]);
+
+            MySqlParameter sqlParameter = new MySqlParameter("@file", SqlDbType.VarBinary);
+
             Console.WriteLine();
             using (MySqlConnection con = new MySqlConnection())
             {
@@ -36,9 +45,17 @@ namespace DB_Test
                 MySqlCommand com = new MySqlCommand(queryString, con);
                 try
                 {
+
+                    MemoryStream a = new MemoryStream(File.ReadAllBytes(filePath), false);
+                    
+                    sqlParameter.Value = a.ToArray();
+                    com.Parameters.Add(sqlParameter);
+
                     con.Open();
                     com.CommandText = queryString;
                     com.ExecuteNonQuery();
+                    con.Close();
+                    com.Dispose();
                 }
                 catch (Exception e)
                 {
