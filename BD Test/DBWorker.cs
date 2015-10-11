@@ -7,28 +7,29 @@ using System.Threading.Tasks;
 using System.Data;
 using MySql.Data.MySqlClient;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DB_Test
 {
     class DBWorker
     {
         private MySqlConnectionStringBuilder mysqlCSB;
-
-
-        private DBWorker()
-        {
-
-        }
+       
 
         public DBWorker(MySqlConnectionStringBuilder MYSQlcsb)
         {
             mysqlCSB = MYSQlcsb;
         }
 
-
+        /// <summary>
+        /// Inputs a new row with file and iformation about it to DB 
+        /// </summary>
+        /// <param name="filePath">Path to file</param>
+        /// <param name="table">Table in DB</param>
         public void SetValue(string filePath, string table)
         {
-            string queryString = String.Format(@"INSERT INTO {0} ({1},{2},{3},{4}) VALUES ('{5}','{6}','{7}','{8}')",
+           
+            string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
 
                 table,FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1], 
                 FileWorker.GetFileInfo(filePath).Keys.ToArray()[2], FileWorker.GetFileInfo(filePath).Keys.ToArray()[3],
@@ -36,29 +37,32 @@ namespace DB_Test
                 FileWorker.GetFileInfo(filePath).Values.ToArray()[0], FileWorker.GetFileInfo(filePath).Values.ToArray()[1],
                 FileWorker.GetFileInfo(filePath).Values.ToArray()[2], FileWorker.GetFileInfo(filePath).Values.ToArray()[3]);
 
-            MySqlParameter sqlParameter = new MySqlParameter("@file", SqlDbType.VarBinary);
-
-            Console.WriteLine();
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
-                MySqlCommand com = new MySqlCommand(queryString, con);
+
+                MySqlCommand mainCommand = new MySqlCommand(queryString, con);
+                MySqlCommand timeoutCommand = new MySqlCommand("set net_write_timeout = 99999; set net_read_timeout = 99999", con);
+
                 try
                 {
+                    byte[] data = FileWorker.GetBytes(filePath);
 
-                    MemoryStream a = new MemoryStream(File.ReadAllBytes(filePath), false);
-                    
-                    sqlParameter.Value = a.ToArray();
-                    com.Parameters.Add(sqlParameter);
-
+                    MySqlParameter param = new MySqlParameter("?file", MySqlDbType.LongBlob, data.Length);
+                    param.Value = data;
+                    mainCommand.Parameters.Add(param);
+                                     
                     con.Open();
-                    com.CommandText = queryString;
-                    com.ExecuteNonQuery();
+                    timeoutCommand.ExecuteNonQuery();
+                    mainCommand.CommandText = queryString;
+                    mainCommand.ExecuteNonQuery();
+
                     con.Close();
-                    com.Dispose();
+                    mainCommand.Dispose();
                 }
                 catch (Exception e)
                 {
+                   //!!!!!!!!!
                     Console.WriteLine(e.Message);
                     Console.ReadLine();
                 }
@@ -68,6 +72,8 @@ namespace DB_Test
 
         public void GetData(string column, string table)
         {
+            throw new NotImplementedException();
+
             string queryString = String.Format(@"SELECT {0} FROM {1}", column, table);
 
             using (MySqlConnection con = new MySqlConnection())
@@ -98,6 +104,8 @@ namespace DB_Test
 
         public void DelValue()
         {
+
+            throw new NotImplementedException();
             string queryString = String.Format(@"");
 
             using (MySqlConnection con = new MySqlConnection())
@@ -127,12 +135,14 @@ namespace DB_Test
 
         }         
     }
-
+    /// <summary>
+    /// Gets information about file
+    /// </summary>
     static class FileWorker
     {
-        public static Dictionary<string, string> GetFileInfo(string path)
+        public static Dictionary<string, object> GetFileInfo(string path)
         {
-            Dictionary<string, string> fileInformation = new Dictionary<string, string>();
+            Dictionary<string, object> fileInformation = new Dictionary<string, object>();
             string fileName = Path.GetFileNameWithoutExtension(path);
             fileInformation.Add("Name", fileName);
 
@@ -140,7 +150,7 @@ namespace DB_Test
             fileInformation.Add("Type", fileType);
 
             DateTime fileCreationDate = File.GetCreationTime(path);
-            fileInformation.Add("Date", fileCreationDate.ToString());
+            fileInformation.Add("Date", fileCreationDate);
 
             FileInfo fi = new FileInfo(path);
             double fileSize = fi.Length;
@@ -158,7 +168,8 @@ namespace DB_Test
             }
             catch (IOException e)
             {
-                Console.WriteLine("this file does not exist\n method will return null");
+                ///!!!!!!!!!!
+                Console.WriteLine("this file does not exist\n method will return null\n",e);
             }
             return output;    
         }
