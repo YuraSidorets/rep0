@@ -14,12 +14,17 @@ namespace DB_Test
     class DBWorker
     {
         private MySqlConnectionStringBuilder mysqlCSB;
-       
 
-        public DBWorker(MySqlConnectionStringBuilder MYSQlcsb)
+        public DBWorker()
         {
-            mysqlCSB = MYSQlcsb;
+            MySqlConnectionStringBuilder mysqlCSB = new MySqlConnectionStringBuilder();
+            mysqlCSB.Server = "mysql.sidoretsyura.myjino.ru";
+            mysqlCSB.Database = "sidoretsyura_testdb";
+            mysqlCSB.UserID = "sidoretsyura";
+            mysqlCSB.Password = "123456";
+            this.mysqlCSB = mysqlCSB;
         }
+
 
         /// <summary>
         /// Inputs a new row with file and iformation about it to DB 
@@ -28,10 +33,10 @@ namespace DB_Test
         /// <param name="table">Table in DB</param>
         public void SetValue(string filePath, string table)
         {
-           
+
             string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
 
-                table,FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1], 
+                table, FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1],
                 FileWorker.GetFileInfo(filePath).Keys.ToArray()[2], FileWorker.GetFileInfo(filePath).Keys.ToArray()[3],
 
                 FileWorker.GetFileInfo(filePath).Values.ToArray()[0], FileWorker.GetFileInfo(filePath).Values.ToArray()[1],
@@ -51,7 +56,7 @@ namespace DB_Test
                     MySqlParameter param = new MySqlParameter("?file", MySqlDbType.LongBlob, data.Length);
                     param.Value = data;
                     mainCommand.Parameters.Add(param);
-                                     
+
                     con.Open();
                     timeoutCommand.ExecuteNonQuery();
                     mainCommand.CommandText = queryString;
@@ -62,13 +67,12 @@ namespace DB_Test
                 }
                 catch (Exception e)
                 {
-                   //!!!!!!!!!
+                    //!!!!!!!!!
                     Console.WriteLine(e.Message);
                     Console.ReadLine();
                 }
             }
         }
-
 
         public void GetData(string column, string table)
         {
@@ -133,7 +137,34 @@ namespace DB_Test
                 }
             }
 
-        }         
+        }
+
+        public DataTable ReadValues()
+        {
+            string query = @"SELECT Id, 
+                               Name,     
+                               Type,
+                               Date,
+                               Size,
+                               Description               
+                        FROM   new_table 
+                        WHERE  Id > 5";
+            DataTable dt = new DataTable();
+
+            using (MySqlConnection con = new MySqlConnection())
+            {
+                con.ConnectionString = this.mysqlCSB.ConnectionString;
+                MySqlCommand com = new MySqlCommand(query, con);
+                con.Open();
+
+                using (MySqlDataReader dr = com.ExecuteReader())
+                {
+                    if (dr.HasRows) dt.Load(dr);
+                }
+
+            }
+            return dt;
+        }
     }
     /// <summary>
     /// Gets information about file
@@ -169,9 +200,9 @@ namespace DB_Test
             catch (IOException e)
             {
                 ///!!!!!!!!!!
-                Console.WriteLine("this file does not exist\n method will return null\n",e);
+                Console.WriteLine("this file does not exist\n method will return null\n", e);
             }
-            return output;    
+            return output;
         }
     }
 }
