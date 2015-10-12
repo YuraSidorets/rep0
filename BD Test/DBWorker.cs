@@ -1,4 +1,5 @@
 ﻿//TODO: Убрать консольные команды 
+//TODO: Сделать этот клас Singleton'ом (сегодня-завтра займусь. скорее завтра, ибо сегодня футбик :D)
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +36,7 @@ namespace DB_Test
         {
 
             string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
-
-                table, FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1],
+               table, FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1],
                 FileWorker.GetFileInfo(filePath).Keys.ToArray()[2], FileWorker.GetFileInfo(filePath).Keys.ToArray()[3],
 
                 FileWorker.GetFileInfo(filePath).Values.ToArray()[0], FileWorker.GetFileInfo(filePath).Values.ToArray()[1],
@@ -139,7 +139,10 @@ namespace DB_Test
 
         }
 
-        public DataTable ReadValues()
+        /// <summary>
+        /// Returns DataTable instance that includes all the values in db except binary data
+        /// </summary>
+        public DataTable ReadAllValues()
         {
             string query = @"SELECT Id, 
                                Name,     
@@ -165,44 +168,31 @@ namespace DB_Test
             }
             return dt;
         }
-    }
-    /// <summary>
-    /// Gets information about file
-    /// </summary>
-    static class FileWorker
-    {
-        public static Dictionary<string, object> GetFileInfo(string path)
+
+        public object[] GetFileToWrite(int id)
         {
-            Dictionary<string, object> fileInformation = new Dictionary<string, object>();
-            string fileName = Path.GetFileNameWithoutExtension(path);
-            fileInformation.Add("Name", fileName);
+            string query = string.Format(
+                      @"SELECT Name,     
+                               Type,
+                               Data               
+                        FROM   new_table 
+                        WHERE  Id = {0}", id);
 
-            string fileType = Path.GetExtension(path);
-            fileInformation.Add("Type", fileType);
+            DataTable dt = new DataTable();
 
-            DateTime fileCreationDate = File.GetCreationTime(path);
-            fileInformation.Add("Date", fileCreationDate);
-
-            FileInfo fi = new FileInfo(path);
-            double fileSize = fi.Length;
-            fileInformation.Add("Size", fileSize.ToString());
-
-            return fileInformation;
-        }
-
-        public static byte[] GetBytes(string path)
-        {
-            byte[] output = null;
-            try
+            using (MySqlConnection con = new MySqlConnection())
             {
-                output = File.ReadAllBytes(path);
+                con.ConnectionString = this.mysqlCSB.ConnectionString;
+                MySqlCommand com = new MySqlCommand(query, con);
+                con.Open();
+
+                using (MySqlDataReader dr = com.ExecuteReader())
+                {
+                    if (dr.HasRows) dt.Load(dr);
+                }
+
             }
-            catch (IOException e)
-            {
-                ///!!!!!!!!!!
-                Console.WriteLine("this file does not exist\n method will return null\n", e);
-            }
-            return output;
+            return dt.Rows[0].ItemArray;
         }
     }
 }
