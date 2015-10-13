@@ -10,7 +10,7 @@ namespace DB_Test
     /// <summary>
      /// Gets information about file
      /// </summary>
-    public static class FileWorker
+    static class FileWorker
     {
         public static Dictionary<string, object> GetFileInfo(string path)
         {
@@ -53,7 +53,7 @@ namespace DB_Test
         /// <param name="pathOfCreatedFile">Directory of file to create</param>
         public static void GetFileFromDB(int id, string pathOfCreatedFile)
         {
-            object[] arr = new DBWorker().GetFileToWrite(id);
+            object[] arr = DBWorker.GetFileToWrite(id);
             string name = arr[0].ToString();
             string type = arr[1].ToString();
             byte[] bytes = arr[2] as byte[];

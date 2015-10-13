@@ -1,5 +1,4 @@
 ﻿//TODO: Убрать консольные команды 
-//TODO: Сделать этот клас Singleton'ом (сегодня-завтра займусь. скорее завтра, ибо сегодня футбик :D)
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +11,24 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DB_Test
 {
-    class DBWorker
+    static class DBWorker
     {
-        private MySqlConnectionStringBuilder mysqlCSB;
+        private static MySqlConnectionStringBuilder mysqlCSB;
 
-        public DBWorker()
+        /// <summary>
+        /// Init static field mysqlCSB
+        /// </summary>
+        private static void Init()
         {
-            MySqlConnectionStringBuilder mysqlCSB = new MySqlConnectionStringBuilder();
-            mysqlCSB.Server = "mysql.sidoretsyura.myjino.ru";
-            mysqlCSB.Database = "sidoretsyura_testdb";
-            mysqlCSB.UserID = "sidoretsyura";
-            mysqlCSB.Password = "123456";
-            this.mysqlCSB = mysqlCSB;
+            if(mysqlCSB == null)
+            {
+                MySqlConnectionStringBuilder CSB = new MySqlConnectionStringBuilder();
+                CSB.Server = "mysql.sidoretsyura.myjino.ru";
+                CSB.Database = "sidoretsyura_testdb";
+                CSB.UserID = "sidoretsyura";
+                CSB.Password = "123456";
+                mysqlCSB = CSB;
+            }
         }
 
 
@@ -32,8 +37,9 @@ namespace DB_Test
         /// </summary>
         /// <param name="filePath">Path to file</param>
         /// <param name="table">Table in DB</param>
-        public void SetValue(string filePath, string table)
+        public static void SetValue(string filePath, string table)
         {
+            Init();
 
             string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
                table, FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1],
@@ -74,7 +80,7 @@ namespace DB_Test
             }
         }
 
-        public void GetData(string column, string table)
+        public static void GetData(string column, string table)
         {
             throw new NotImplementedException();
 
@@ -106,7 +112,7 @@ namespace DB_Test
             }
         }
 
-        public void DelValue()
+        public static void DelValue()
         {
 
             throw new NotImplementedException();
@@ -142,8 +148,10 @@ namespace DB_Test
         /// <summary>
         /// Returns DataTable instance that includes all the values in db except binary data
         /// </summary>
-        public DataTable ReadAllValues()
+        public static DataTable ReadAllValues()
         {
+            Init();
+
             string query = @"SELECT Id, 
                                Name,     
                                Type,
@@ -156,7 +164,7 @@ namespace DB_Test
 
             using (MySqlConnection con = new MySqlConnection())
             {
-                con.ConnectionString = this.mysqlCSB.ConnectionString;
+                con.ConnectionString = mysqlCSB.ConnectionString;
                 MySqlCommand com = new MySqlCommand(query, con);
                 con.Open();
 
@@ -169,8 +177,10 @@ namespace DB_Test
             return dt;
         }
 
-        public object[] GetFileToWrite(int id)
+        public static object[] GetFileToWrite(int id)
         {
+            Init();
+
             string query = string.Format(
                       @"SELECT Name,     
                                Type,
@@ -182,7 +192,7 @@ namespace DB_Test
 
             using (MySqlConnection con = new MySqlConnection())
             {
-                con.ConnectionString = this.mysqlCSB.ConnectionString;
+                con.ConnectionString = mysqlCSB.ConnectionString;
                 MySqlCommand com = new MySqlCommand(query, con);
                 con.Open();
 
