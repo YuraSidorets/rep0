@@ -1,0 +1,27 @@
+﻿<Window x:Name="WindowMain" x:Class="Client_UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Client_UI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="600" Background="#FF999999" SnapsToDevicePixels="True" WindowStartupLocation="CenterScreen" WindowState="Maximized" BorderBrush="Black">
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="117*"/>
+            <ColumnDefinition x:Name="WorkColumn" Width="31*"/>
+        </Grid.ColumnDefinitions>
+        <DataGrid x:Name="dataGrid" Background="#CCCCCCCC" BorderBrush="#FF080A0C" BorderThickness="1" Margin="1,1,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Foreground="#FFCCCCCC" Header="ID"/>
+                <DataGridTextColumn Header="Name" Width="100"/>
+                <DataGridTextColumn Header="Type" Width="50"/>
+                <DataGridTemplateColumn Header="Date" Width="150"/>
+                <DataGridTemplateColumn Header="Size" Width="75"/>
+                <DataGridTextColumn Header="Description"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <GroupBox x:Name="groupBox" Grid.Column="1" Header="Work Panel" Margin="0,0,3.303,0"/>
+
+    </Grid>
+</Window>
