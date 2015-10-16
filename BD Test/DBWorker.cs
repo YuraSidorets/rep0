@@ -28,14 +28,15 @@ namespace DB_Test
         /// <param name="table">Table in DB</param>
         public void SetValue(string filePath, string table)
         {
-           
+            Dictionary<string, object> info = FileWorker.GetFileInfo(filePath);
+
             string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
 
-                table,FileWorker.GetFileInfo(filePath).Keys.ToArray()[0], FileWorker.GetFileInfo(filePath).Keys.ToArray()[1], 
-                FileWorker.GetFileInfo(filePath).Keys.ToArray()[2], FileWorker.GetFileInfo(filePath).Keys.ToArray()[3],
+                table,info.Keys.ToArray()[0], info.Keys.ToArray()[1], 
+                info.Keys.ToArray()[2], info.Keys.ToArray()[3],
 
-                FileWorker.GetFileInfo(filePath).Values.ToArray()[0], FileWorker.GetFileInfo(filePath).Values.ToArray()[1],
-                FileWorker.GetFileInfo(filePath).Values.ToArray()[2], FileWorker.GetFileInfo(filePath).Values.ToArray()[3]);
+                info.Values.ToArray()[0], info.Values.ToArray()[1],
+                info.Values.ToArray()[2], info.Values.ToArray()[3]);
 
             using (MySqlConnection con = new MySqlConnection())
             {
