@@ -11,23 +11,36 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DB_Test
 {
-    class DBWorker
+    static class DBWorker
     {
-        private MySqlConnectionStringBuilder mysqlCSB;
-       
+        private static MySqlConnectionStringBuilder mysqlCSB;
 
-        public DBWorker(MySqlConnectionStringBuilder MYSQlcsb)
+        /// <summary>
+        /// Init static field mysqlCSB
+        /// </summary>
+        private static void Init()
         {
-            mysqlCSB = MYSQlcsb;
+            if(mysqlCSB == null)
+            {
+                MySqlConnectionStringBuilder CSB = new MySqlConnectionStringBuilder();
+                CSB.Server = "mysql.sidoretsyura.myjino.ru";
+                CSB.Database = "sidoretsyura_testdb";
+                CSB.UserID = "sidoretsyura";
+                CSB.Password = "123456";
+                mysqlCSB = CSB;
+            }
         }
+
 
         /// <summary>
         /// Inputs a new row with file and iformation about it to DB 
         /// </summary>
         /// <param name="filePath">Path to file</param>
         /// <param name="table">Table in DB</param>
-        public void SetValue(string filePath, string table)
+        public static void SetValue(string filePath, string table)
         {
+
+            Init();
             Dictionary<string, object> info = FileWorker.GetFileInfo(filePath);
 
             string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
@@ -37,7 +50,7 @@ namespace DB_Test
 
                 info.Values.ToArray()[0], info.Values.ToArray()[1],
                 info.Values.ToArray()[2], info.Values.ToArray()[3]);
-
+          
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
@@ -52,7 +65,7 @@ namespace DB_Test
                     MySqlParameter param = new MySqlParameter("?file", MySqlDbType.LongBlob, data.Length);
                     param.Value = data;
                     mainCommand.Parameters.Add(param);
-                                     
+
                     con.Open();
                     timeoutCommand.ExecuteNonQuery();
                     mainCommand.CommandText = queryString;
@@ -63,7 +76,7 @@ namespace DB_Test
                 }
                 catch (Exception e)
                 {
-                   //!!!!!!!!!
+                    //!!!!!!!!!
                     Console.WriteLine(e.Message);
                     Console.ReadLine();
                 }
@@ -71,108 +84,64 @@ namespace DB_Test
         }
 
 
-        public void GetData(string column, string table)
+        /// <summary>
+        /// Returns DataTable instance that includes all the values in db except binary data
+        /// </summary>
+        public static DataTable ReadAllValues()
         {
-            throw new NotImplementedException();
+            Init();
 
-            string queryString = String.Format(@"SELECT {0} FROM {1}", column, table);
+            string query = @"SELECT Id, 
+                               Name,     
+                               Type,
+                               Date,
+                               Size,
+                               Description               
+                        FROM   new_table 
+                        WHERE  Id > 5";
+            DataTable dt = new DataTable();
 
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
-                MySqlCommand com = new MySqlCommand(queryString, con);
-                try
-                {
-                    con.Open();
-                    com.CommandText = queryString;
-                    MySqlDataReader reader = com.ExecuteReader();
+                MySqlCommand com = new MySqlCommand(query, con);                         
+                con.Open();
 
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            Console.WriteLine("{0}\t", reader.GetValue(0));
-                        }
-                    }
-                }
-                catch (Exception e)
+                using (MySqlDataReader dr = com.ExecuteReader())
                 {
-                    Console.WriteLine(e.Message);
-                    Console.ReadLine();
+                    if (dr.HasRows) dt.Load(dr);
                 }
+
             }
+            return dt;
         }
 
-        public void DelValue()
+        public static object[] GetFileToWrite(int id)
         {
+            Init();
 
-            throw new NotImplementedException();
-            string queryString = String.Format(@"");
+            string query = string.Format(
+                      @"SELECT Name,     
+                               Type,
+                               Data               
+                        FROM   new_table 
+                        WHERE  Id = {0}", id);
+
+            DataTable dt = new DataTable();
 
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
-                MySqlCommand com = new MySqlCommand(queryString, con);
-                try
+                MySqlCommand com = new MySqlCommand(query, con);
+                con.Open();
+
+                using (MySqlDataReader dr = com.ExecuteReader())
                 {
-                    con.Open();
-                    com.CommandText = queryString;
-                    MySqlDataReader reader = com.ExecuteReader();
-
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            Console.WriteLine("{0}\t", reader.GetValue(0));
-                        }
-                    }
+                    if (dr.HasRows) dt.Load(dr);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    Console.ReadLine();
-                }
+
             }
-
-        }         
-    }
-    /// <summary>
-    /// Gets information about file
-    /// </summary>
-    static class FileWorker
-    {
-        public static Dictionary<string, object> GetFileInfo(string path)
-        {
-            Dictionary<string, object> fileInformation = new Dictionary<string, object>();
-            string fileName = Path.GetFileNameWithoutExtension(path);
-            fileInformation.Add("Name", fileName);
-
-            string fileType = Path.GetExtension(path);
-            fileInformation.Add("Type", fileType);
-
-            DateTime fileCreationDate = File.GetCreationTime(path);
-            fileInformation.Add("Date", fileCreationDate);
-
-            FileInfo fi = new FileInfo(path);
-            double fileSize = fi.Length;
-            fileInformation.Add("Size", fileSize.ToString());
-
-            return fileInformation;
-        }
-
-        public static byte[] GetBytes(string path)
-        {
-            byte[] output = null;
-            try
-            {
-                output = File.ReadAllBytes(path);
-            }
-            catch (IOException e)
-            {
-                ///!!!!!!!!!!
-                Console.WriteLine("this file does not exist\n method will return null\n",e);
-            }
-            return output;    
+            return dt.Rows[0].ItemArray;
         }
     }
 }

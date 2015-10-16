@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using System.Data; //test
+
 
 namespace DB_Test
 {
@@ -11,18 +13,19 @@ namespace DB_Test
     {
         static void Main(string[] args)
         {
-           
-            MySqlConnectionStringBuilder mysqlCSB = new MySqlConnectionStringBuilder();
-            mysqlCSB.Server = "mysql.sidoretsyura.myjino.ru";
-            mysqlCSB.Database = "sidoretsyura_testdb";
-            mysqlCSB.UserID = "sidoretsyura";
-            mysqlCSB.Password = "123456";
-
-            DBWorker worker = new DBWorker(mysqlCSB);
-           
-
-            worker.SetValue(@"F:\Flash\Protokol.docx", "new_table");
-
+            //DBWorker worker = new DBWorker();
+            ////DBWorker.SetValue(@"E:\4.txt", "new_table");
+            DataTable dt = DBWorker.ReadAllValues();
+            foreach (DataRow row in dt.Rows)
+            {
+                foreach (var value in row.ItemArray)
+                {
+                    Console.WriteLine(value);
+                }
+                Console.WriteLine(new string('-', 30));
+            }
+            //FileWorker.GetFileFromDB(15, @"E:\");
+            Console.ReadKey();
         }
     }
 }
