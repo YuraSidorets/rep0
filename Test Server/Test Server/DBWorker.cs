@@ -1,13 +1,8 @@
-﻿//TODO: Убрать консольные команды 
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using MySql.Data.MySqlClient;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DB_Test
 {
@@ -76,9 +71,7 @@ namespace DB_Test
                 }
                 catch (Exception e)
                 {
-                    //!!!!!!!!!
-                    Console.WriteLine(e.Message);
-                    Console.ReadLine();
+                   
                 }
             }
         }
