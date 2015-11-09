@@ -13,20 +13,8 @@ namespace DB_Test
     {
         static void Main(string[] args)
         {
-            //DBWorker worker = new DBWorker();
-            ////DBWorker.SetValue(@"E:\4.txt", "new_table");
-            //DataTable dt = DBWorker.ReadAllValues();
-            //foreach (DataRow row in dt.Rows)
-            //{
-            //    foreach (var value in row.ItemArray)
-            //    {
-            //        Console.WriteLine(value);
-            //    }
-            //    Console.WriteLine(new string('-', 30));
-            //}
-            //FileWorker.GetFileFromDB(15, @"E:\");
-
-            DBWorker.DeleteFromTable("new_table", "db");
+            TcpWorker tcpW = new TcpWorker();
+            tcpW.TestListen();
             Console.ReadKey();
         }
     }

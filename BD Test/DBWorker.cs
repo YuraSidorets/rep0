@@ -20,7 +20,7 @@ namespace DB_Test
         /// </summary>
         private static void Init()
         {
-            if(mysqlCSB == null)
+            if (mysqlCSB == null)
             {
                 MySqlConnectionStringBuilder CSB = new MySqlConnectionStringBuilder();
                 CSB.Server = "mysql.sidoretsyura.myjino.ru";
@@ -37,20 +37,19 @@ namespace DB_Test
         /// </summary>
         /// <param name="filePath">Path to file</param>
         /// <param name="table">Table in DB</param>
-        public static void SetValue(string filePath, string table)
+        public static void SetValue(string filePath)
         {
-
             Init();
-            Dictionary<string, object> info = FileWorker.GetFileInfo(filePath);
+            Dictionary<string, string> info = FileWorkerDB.GetFileInfo(filePath);
 
-            string queryString = string.Format(@"INSERT INTO {0} ({1},{2},{3},{4},Data) VALUES ('{5}','{6}','{7:yyyy-MM-dd hh:mm:ss}','{8}',?file)",
+            string queryString = string.Format(@"INSERT INTO new_table ({0},{1},{2},{3},Data) VALUES ('{4}','{5}','{6:yyyy-MM-dd hh:mm:ss}','{7}',?file)",
 
-                table,info.Keys.ToArray()[0], info.Keys.ToArray()[1], 
+                info.Keys.ToArray()[0], info.Keys.ToArray()[1],
                 info.Keys.ToArray()[2], info.Keys.ToArray()[3],
 
                 info.Values.ToArray()[0], info.Values.ToArray()[1],
                 info.Values.ToArray()[2], info.Values.ToArray()[3]);
-          
+
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
@@ -60,7 +59,7 @@ namespace DB_Test
 
                 try
                 {
-                    byte[] data = FileWorker.GetBytes(filePath);
+                    byte[] data = FileWorkerDB.GetBytes(filePath);
 
                     MySqlParameter param = new MySqlParameter("?file", MySqlDbType.LongBlob, data.Length);
                     param.Value = data;
@@ -87,7 +86,7 @@ namespace DB_Test
         /// <summary>
         /// Returns DataTable instance that includes all the values in db except binary data
         /// </summary>
-        public static DataTable ReadAllValues()
+        public static DataTable ReadValue()
         {
             Init();
 
@@ -104,7 +103,7 @@ namespace DB_Test
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
-                MySqlCommand com = new MySqlCommand(query, con);                         
+                MySqlCommand com = new MySqlCommand(query, con);
                 con.Open();
 
                 using (MySqlDataReader dr = com.ExecuteReader())
@@ -155,7 +154,7 @@ namespace DB_Test
 
             Init();
 
-            string query = string.Format(@"DELETE FROM {0} WHERE id='{1}'", table,id);
+            string query = string.Format(@"DELETE FROM {0} WHERE id='{1}'", table, id);
 
             using (MySqlConnection con = new MySqlConnection())
             {

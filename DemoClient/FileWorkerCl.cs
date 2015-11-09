@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace DB_Test
+namespace DemoClient
 {
     /// <summary>
      /// Gets information about file
      /// </summary>
-    static class FileWorker
+    static class FileWorkerCl
     {
         public static Dictionary<string, object> GetFileInfo(string path)
         {
@@ -53,7 +53,7 @@ namespace DB_Test
         /// <param name="pathOfCreatedFile">Directory of file to create</param>
         public static void GetFileFromDB(int id, string pathOfCreatedFile)
         {
-            object[] arr = DBWorker.GetFileToWrite(id);
+            object[] arr = null;//DBWorker.GetFileToWrite(id);
             string name = arr[0].ToString();
             string type = arr[1].ToString();
             byte[] bytes = arr[2] as byte[];
