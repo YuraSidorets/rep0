@@ -14,16 +14,13 @@ namespace DemoClient
         {
             while (true)
             {
-                //RequestManager.SendRequest("::1", 11000, Encoding.UTF8.GetBytes("init"), RequestEnum.Init);
-                //Console.WriteLine("Message: ");
-                //string message = Console.ReadLine();
-                //byte[] byteMessage = Encoding.UTF8.GetBytes(message);
                 OpenFileDialog opd = new OpenFileDialog();
                 opd.ShowDialog();
                 string path = opd.FileName;
 
-                RequestManager rm = new RequestManager(path, 11000);
+                RequestManager rm = new RequestManager(path, 29250);
                 rm.SendRequest(RequestEnum.Add);
+                
             }
 
         }
