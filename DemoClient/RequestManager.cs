@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using TcpNetwork.Commands;
-using TcpNetwork.Enums;
-using TcpNetwork.Network;
-using TcpNetwork.Utils;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -72,11 +65,14 @@ namespace DemoClient
             using (MemoryStream ms = new MemoryStream())
             {
                 bf.Serialize(ms, CreateDictToSendFile());
+
                 Console.WriteLine("Размер отправляемых данных: {0}", ms.ToArray().Length);
-                sender.Send(ms.ToArray());
+
+               // sender.Send(ms.ToArray(), ms.ToArray().Length,SocketFlags.None);
+                sender.SendFile(path);
             }
 
-            byte[] bytesOfAnswer = new byte[1024];
+            byte[] bytesOfAnswer = new byte[10485760];
             int bytesRec = sender.Receive(bytesOfAnswer);
             string answer = Encoding.UTF8.GetString(bytesOfAnswer, 0, bytesRec);
             Console.WriteLine("\nОтвет от сервера: {0}\n\n", answer);

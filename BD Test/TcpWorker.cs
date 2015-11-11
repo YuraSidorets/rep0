@@ -58,9 +58,8 @@ namespace DB_Test
         public void TestListen()
         {
 
-            IPHostEntry ipHost = Dns.GetHostEntry("localhost");
-            IPAddress ipAddr = ipHost.AddressList[0];
-            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 11000);
+            IPAddress ipAddr = IPAddress.Parse("193.161.14.47");
+            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 5050);
 
             // Создаем сокет Tcp/Ip
             Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -82,19 +81,22 @@ namespace DB_Test
 
                     // Мы дождались клиента, пытающегося с нами соединиться
 
-                    byte[] bytes = new byte[10485760];
+                    byte[] bytes = new byte[1024];
                     //только 1440 байт
-                    int bytesRec = handler.Receive(bytes, 0, 65070, SocketFlags.None);
-
+                    int bytesRec = handler.Receive(bytes,SocketFlags.None);
+                    
                     Console.WriteLine("Размер полученного пакета: {0}", bytesRec);
 
                     BinaryFormatter bf = new BinaryFormatter();
+                   
                     using (MemoryStream ms = new MemoryStream())
                     {
                         ms.Write(bytes, 0, bytes.Length);
-                        ms.Seek(0, SeekOrigin.Begin);
-                        object o = bf.Deserialize(ms);
-                        this.contentOfAddingFile = (Dictionary<string, object>)o;
+
+                     
+                       
+                      // var o = (Dictionary<string, object>)bf.Deserialize(ms);
+                        //this.contentOfAddingFile = (Dictionary<string, object>)o;
                     }
 
                     data += Encoding.UTF8.GetString(bytes, 0, bytesRec);
