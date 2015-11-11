@@ -30,7 +30,8 @@ namespace DB_Test
                 {
                     Console.WriteLine("Ожидаем соединение через порт {0}", ipEndPoint);
                     Socket handler = sListener.Accept();
-                    RecieveFileDict(handler);
+                    //RecieveFileDict(handler);
+                    RecieveFileDictAndCreateTempFile(handler);
                     handler.Shutdown(SocketShutdown.Both);
                     handler.Close();
                 }
@@ -87,6 +88,33 @@ namespace DB_Test
             DBWorker.SetValue(contentOfAddingFile);
             Console.WriteLine("Получено байт: {0}", totalBytes);
             netStream.Close();
+        }
+
+        private void RecieveFileDictAndCreateTempFile(Socket reciever)
+        {
+            NetworkStream netStream = new NetworkStream(reciever);
+
+            FileStream fs = new FileStream("$temp", FileMode.Create, FileAccess.Write);
+            byte[] data = new byte[1024];
+            int dataCitit;
+            int totalBytes = 0;
+
+            while ((dataCitit = netStream.Read(data, 0, data.Length)) > 0)
+            {
+                fs.Write(data, 0, dataCitit);
+                totalBytes += dataCitit;
+            }
+
+            Console.WriteLine("Получено байт: {0}", totalBytes);
+            netStream.Close();
+            fs.Close();
+
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream(File.ReadAllBytes("$temp")))
+            {
+                this.contentOfAddingFile = (Dictionary<string, object>)bf.Deserialize(ms);
+            }
+            DBWorker.SetValue(contentOfAddingFile);
         }
     }
 }
