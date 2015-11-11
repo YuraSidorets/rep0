@@ -1,13 +1,8 @@
 ﻿//TODO: Убрать консольные команды 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using MySql.Data.MySqlClient;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace DB_Test
 {
@@ -37,19 +32,13 @@ namespace DB_Test
         /// </summary>
         /// <param name="filePath">Path to file</param>
         /// <param name="table">Table in DB</param>
-        public static void SetValue(string filePath)
+        public static void SetValue(Dictionary<string, object> info)
         {
             Init();
-            Dictionary<string, string> info = FileWorkerDB.GetFileInfo(filePath);
 
-            string queryString = string.Format(@"INSERT INTO new_table ({0},{1},{2},{3},Data) VALUES ('{4}','{5}','{6:yyyy-MM-dd hh:mm:ss}','{7}',?file)",
-
-                info.Keys.ToArray()[0], info.Keys.ToArray()[1],
-                info.Keys.ToArray()[2], info.Keys.ToArray()[3],
-
-                info.Values.ToArray()[0], info.Values.ToArray()[1],
-                info.Values.ToArray()[2], info.Values.ToArray()[3]);
-
+            string queryString = string.Format(@"INSERT INTO new_table (Name, Type, Date, Size, Data) VALUES ('{0}','{1}','{2:yyyy-MM-dd hh:mm:ss}','{3}',?file)",
+                info["Name"], info["Type"], info["Date"], info["Size"]);
+                
             using (MySqlConnection con = new MySqlConnection())
             {
                 con.ConnectionString = mysqlCSB.ConnectionString;
@@ -59,7 +48,7 @@ namespace DB_Test
 
                 try
                 {
-                    byte[] data = FileWorkerDB.GetBytes(filePath);
+                    byte[] data = (byte[])info["Data"];
 
                     MySqlParameter param = new MySqlParameter("?file", MySqlDbType.LongBlob, data.Length);
                     param.Value = data;

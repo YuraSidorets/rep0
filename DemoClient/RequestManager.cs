@@ -12,6 +12,8 @@ namespace DemoClient
     {
         string path { get; set; }
         int port { get; set; } //11000
+        //public string SendingFilePath = string.Empty;
+        private const int BufferSize = 1024;
 
         public RequestManager(string path, int port)
         {
@@ -27,7 +29,8 @@ namespace DemoClient
                 {
                     case RequestEnum.Add:
                         {
-                            this.SendRequestToAddFile();
+                            //this.SendRequestToAddFile();
+                            this.SendFileDict();
                             break;
                         }
 
@@ -62,23 +65,27 @@ namespace DemoClient
             Console.WriteLine("Сокет соединяется с {0} ", sender.RemoteEndPoint.ToString());
 
             BinaryFormatter bf = new BinaryFormatter();
+
             using (MemoryStream ms = new MemoryStream())
             {
                 bf.Serialize(ms, CreateDictToSendFile());
 
                 Console.WriteLine("Размер отправляемых данных: {0}", ms.ToArray().Length);
-
-               // sender.Send(ms.ToArray(), ms.ToArray().Length,SocketFlags.None);
-                sender.SendFile(path);
+                
+                sender.Send(ms.ToArray(), 0, (int)ms.Length, SocketFlags.None);
             }
+            //sender.SendFile(path);
+
+            FileInfo fi = new FileInfo(path);
+            Console.WriteLine("Размер отправляемых данных: {0}", fi.Length);
 
             byte[] bytesOfAnswer = new byte[10485760];
             int bytesRec = sender.Receive(bytesOfAnswer);
             string answer = Encoding.UTF8.GetString(bytesOfAnswer, 0, bytesRec);
             Console.WriteLine("\nОтвет от сервера: {0}\n\n", answer);
-
             sender.Shutdown(SocketShutdown.Both);
             sender.Close();
+
         }
 
         private Dictionary<string, object> CreateDictToSendFile()
@@ -94,7 +101,33 @@ namespace DemoClient
             return fileInformation;
         }
 
+        void SendFileDict()
+        {
+            TcpClient client = new TcpClient("::1", 11000);
+            
+            NetworkStream netStream = client.GetStream();
+            //FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            //byte[] data = new byte[fs.Length];
+            //List<byte> data = new List<byte>();
+            BinaryFormatter bf = new BinaryFormatter();
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, CreateDictToSendFile());
+                Console.WriteLine("Размер отправляемых данных: {0}", ms.ToArray().Length);
+
+                byte[] data = ms.ToArray();
+                netStream.Write(data, 0, data.Length);
+                netStream.Flush();
+                netStream.Close();
+            }
+
+            //fs.Read(data, 0, data.Length);
+            //fs.Flush();
+            //fs.Close();
+
 
     }
+}
 }
 
