@@ -18,9 +18,9 @@ namespace DB_Test
         public void Listen()
         {
 
-            IPHostEntry ipHost = Dns.GetHostEntry("localhost");
-            IPAddress ipAddr = ipHost.AddressList[0];
-            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 11000);
+            // IPHostEntry ipHost = Dns.GetHostEntry("10.241.129.147");
+            IPAddress ipAddr = IPAddress.Parse("192.168.1.4");//ipHost.AddressList[0];
+            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 80);
             Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             try
             {
@@ -54,43 +54,11 @@ namespace DB_Test
         private void TestDisplay()
         {
             foreach (KeyValuePair<string, object> kVP in contentOfAddingFile)
-<<<<<<< HEAD
-
-            IPAddress ipAddr = IPAddress.Parse("193.161.14.47");
-            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 5050);
-
-            // Создаем сокет Tcp/Ip
-            Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-            // Назначаем сокет локальной конечной точке и слушаем входящие сокеты
-            try
-=======
-            foreach (KeyValuePair<string, object> kVP in contentOfAddingFile)
->>>>>>> b2cc0538fe7e60e6ab5705a0c05d657dbdefdd74
             {
                 Console.WriteLine("{0} - {1}", kVP.Key, kVP.Value.ToString());
             }
         }
 
-<<<<<<< HEAD
-                    byte[] bytes = new byte[1024];
-                    //только 1440 байт
-                    int bytesRec = handler.Receive(bytes,SocketFlags.None);
-                    
-                    Console.WriteLine("Размер полученного пакета: {0}", bytesRec);
-
-                    BinaryFormatter bf = new BinaryFormatter();
-                   
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ms.Write(bytes, 0, bytes.Length);
-
-                     
-                       
-                      // var o = (Dictionary<string, object>)bf.Deserialize(ms);
-                        //this.contentOfAddingFile = (Dictionary<string, object>)o;
-                    }
-=======
         /// <summary>
         /// Recieve Dictionary of (string, object) that contains all info about recieved file 
         /// </summary>
@@ -108,10 +76,12 @@ namespace DB_Test
                 listOfDict.AddRange(data);
                 totalBytes += dataCitit;
             }
-            using (MemoryStream ms = new MemoryStream(listOfDict.ToArray()))
+
             BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream(listOfDict.ToArray()))
+            {
                 this.contentOfAddingFile = (Dictionary<string, object>)bf.Deserialize(ms);
->>>>>>> b2cc0538fe7e60e6ab5705a0c05d657dbdefdd74
+            }
 
             TestDisplay();
 
