@@ -7,7 +7,7 @@ namespace DB_Test
     {
         static void Main(string[] args)
         {
-            TcpWorker tcpW = new TcpWorker();
+            ServerTcpWorker tcpW = new ServerTcpWorker();
             tcpW.Listen();
             
             Console.ReadKey();

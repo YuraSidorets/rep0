@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 
 namespace DB_Test
 {
-    static class DBWorker
+    internal static class DBWorker
     {
         private static MySqlConnectionStringBuilder mysqlCSB;
 
@@ -17,12 +17,19 @@ namespace DB_Test
         {
             if (mysqlCSB == null)
             {
-                MySqlConnectionStringBuilder CSB = new MySqlConnectionStringBuilder();
-                CSB.Server = "mysql.sidoretsyura.myjino.ru";
-                CSB.Database = "sidoretsyura_testdb";
-                CSB.UserID = "sidoretsyura";
-                CSB.Password = "123456";
-                mysqlCSB = CSB;
+                mysqlCSB = new MySqlConnectionStringBuilder();
+                //CSB.Server = "mysql.sidoretsyura.myjino.ru";
+                //CSB.Database = "sidoretsyura_testdb";
+                //CSB.UserID = "sidoretsyura";
+                //CSB.Password = "123456";
+                //mysqlCSB = CSB;
+
+                mysqlCSB.Server = "127.0.0.1";
+                mysqlCSB.UserID = "root";
+                mysqlCSB.Database = "test";
+                mysqlCSB.Password = "1234";
+                    
+
             }
         }
 
@@ -75,7 +82,7 @@ namespace DB_Test
         /// <summary>
         /// Returns DataTable instance that includes all the values in db except binary data
         /// </summary>
-        public static DataTable ReadValue()
+        public static DataTable GetDataTable()
         {
             Init();
 

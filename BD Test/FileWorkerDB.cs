@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DB_Test
 {
-    class FileWorkerDB
+    internal class FileWorkerDB
     {
         //string, object
         public static Dictionary<string, string> GetFileInfo(string path)

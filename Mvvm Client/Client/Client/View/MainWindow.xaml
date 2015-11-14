@@ -8,6 +8,10 @@
         Title="SU Data Storage" Height="600" Width="900
         " Background="#FF2D2D30">
 
+    <Window.DataContext>
+        <local:MainWindowViewModel></local:MainWindowViewModel>
+    </Window.DataContext>
+
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -25,9 +29,9 @@
                     <MenuItem.Effect>
                         <DropShadowEffect BlurRadius="2" Color="#FF656565" Opacity="0.2" Direction="215"/>
                     </MenuItem.Effect>
-                    <Button Background="#FFF0F0F0" Content="Open"/>
-                    <Button Background="#FFE7E7E7" Content="Connect"/>
-                    <Button Background="#FFE2E2E2" Content="Close"/>
+                    <Button Background="#FFF0F0F0" Content="Upload" Command="{Binding AddClient}"/>
+                    
+                    <Button Background="#FFE7E7E7" Content="Download"/>
                 </MenuItem>
                 <MenuItem x:Name="menuAdd" Header="       Add Item" Height="25" Background="#FF656565" Width="120" FontFamily="Segoe UI Black" TextBlock.TextAlignment="Center" RenderTransformOrigin="0.556,0.6">
                     <MenuItem.Effect>

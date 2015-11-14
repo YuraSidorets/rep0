@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DemoClient
@@ -14,12 +10,38 @@ namespace DemoClient
         {
             while (true)
             {
-                OpenFileDialog opd = new OpenFileDialog();
-                opd.ShowDialog();
-                string path = opd.FileName;
+                Console.WriteLine("1 : Upload File\n2 : DownloadFile");
+                string selector = Console.ReadLine();
 
-                RequestManager rm = new RequestManager(path, 29250);
-                rm.SendRequest(RequestEnum.Add);
+                switch(selector)
+                {
+                    case "1":
+                        {
+                            OpenFileDialog opd = new OpenFileDialog();
+                            opd.ShowDialog();
+                            string path = opd.FileName;
+
+                            ClientTcpWorker rm = new ClientTcpWorker(path, 5050, "::1");
+                            rm.SendFileDict();
+                            break;
+                        }
+
+                    case "2":
+                        {
+                            Console.WriteLine("Id of file to download");
+                            string id = Console.ReadLine();
+
+                            SaveFileDialog sfd = new SaveFileDialog();
+                            sfd.ShowDialog();
+                            string path = sfd.FileName;
+
+                            ClientTcpWorker rm = new ClientTcpWorker(path, 5050, "::1");
+                            rm.SendIdDict(id);
+                            break;
+                        }
+                }
+
+
                 
             }
 

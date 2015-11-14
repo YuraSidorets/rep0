@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DemoClient
 {
-    public enum RequestEnum
+    internal enum RequestEnum
     {
         Add,
         Download,
