@@ -29,9 +29,9 @@
                     <MenuItem.Effect>
                         <DropShadowEffect BlurRadius="2" Color="#FF656565" Opacity="0.2" Direction="215"/>
                     </MenuItem.Effect>
-                    <Button Background="#FFF0F0F0" Content="Upload" Command="{Binding AddClient}"/>
+                    <Button Background="#FFF0F0F0" Content="Upload" Command="{Binding Upload}"/>
                     
-                    <Button Background="#FFE7E7E7" Content="Download"/>
+                    <Button Background="#FFE7E7E7" Content="Download" Command="{Binding Download}"/>
                 </MenuItem>
                 <MenuItem x:Name="menuAdd" Header="       Add Item" Height="25" Background="#FF656565" Width="120" FontFamily="Segoe UI Black" TextBlock.TextAlignment="Center" RenderTransformOrigin="0.556,0.6">
                     <MenuItem.Effect>

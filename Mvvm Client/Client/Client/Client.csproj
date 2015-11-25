@@ -59,7 +59,6 @@
     <Compile Include="Infrastructure\RelayCommand.cs" />
     <Compile Include="Model\ClientTcpWorker.cs" />
     <Compile Include="Model\FileWorkerCl.cs" />
-    <Compile Include="Model\RequestManager.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="View\MainWindow.xaml">
@@ -93,7 +92,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ClassDiagram.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
