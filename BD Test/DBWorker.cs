@@ -18,16 +18,17 @@ namespace DB_Test
             if (mysqlCSB == null)
             {
                 mysqlCSB = new MySqlConnectionStringBuilder();
-                //CSB.Server = "mysql.sidoretsyura.myjino.ru";
-                //CSB.Database = "sidoretsyura_testdb";
-                //CSB.UserID = "sidoretsyura";
-                //CSB.Password = "123456";
-                //mysqlCSB = CSB;
 
-                mysqlCSB.Server = "127.0.0.1";
-                mysqlCSB.UserID = "root";
-                mysqlCSB.Database = "test";
-                mysqlCSB.Password = "1234";
+                mysqlCSB.Server = "mysql.sidoretsyura.myjino.ru";
+                mysqlCSB.Database = "sidoretsyura_testdb";
+                mysqlCSB.UserID = "sidoretsyura";
+                mysqlCSB.Password = "123456";
+                
+
+                //mysqlCSB.Server = "127.0.0.1";
+                //mysqlCSB.UserID = "root";
+                //mysqlCSB.Database = "test";
+                //mysqlCSB.Password = "1234";
                     
 
             }
@@ -111,7 +112,7 @@ namespace DB_Test
             return dt;
         }
 
-        public static object[] GetFileToWrite(int id)
+        public static object GetFileToWrite(int id)
         {
             Init();
 
@@ -136,7 +137,7 @@ namespace DB_Test
                 }
 
             }
-            return dt.Rows[0].ItemArray;
+            return (object)dt; //dt.Rows[0].ItemArray;
         }
 
         /// <summary>

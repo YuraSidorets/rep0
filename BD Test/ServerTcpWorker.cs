@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Microsoft.VisualBasic;
+using System.Threading;
 
 namespace DB_Test
 {
@@ -69,19 +69,22 @@ namespace DB_Test
             byte[] data = new byte[1024];
             int dataCitit;
             int totalBytes = 0;
-
-            while ((dataCitit = netStream.Read(data, 0, data.Length)) > 0)
+            
+            do
             {
+                dataCitit = netStream.Read(data, 0, data.Length);
                 fs.Write(data, 0, dataCitit);
                 totalBytes += dataCitit;
-            }
-
-            Console.WriteLine("Получено байт: {0}", totalBytes);
-            netStream.Close();
+            } while (netStream.DataAvailable);
             fs.Close();
+            
+            Console.WriteLine("Получено байт: {0}", totalBytes);
+
+           
 
             BinaryFormatter bf = new BinaryFormatter();
-            Dictionary<string, object> contentOfAddingFile = new Dictionary<string, object>();
+            Dictionary<string, object> contentOfAddingFile;
+
             using (MemoryStream ms = new MemoryStream(File.ReadAllBytes("$temp")))
             {
                 contentOfAddingFile = (Dictionary<string, object>)bf.Deserialize(ms);
@@ -90,10 +93,19 @@ namespace DB_Test
             if (contentOfAddingFile["Command"].ToString().Equals("Add"))
                 DBWorker.SetValue(contentOfAddingFile);
             else if (contentOfAddingFile["Command"].ToString().Equals("Download"))
-                DBWorker.GetFileToWrite((int)contentOfAddingFile["Id"]);
+            {
+                object fileToSend = DBWorker.GetFileToWrite((int.Parse((string)contentOfAddingFile["Id"])));
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    bf.Serialize(ms, fileToSend);
+
+                    netStream.Write(ms.ToArray(), 0, ms.ToArray().Length);
+                }
+            }
             else
                 throw new FormatException();
-
+            netStream.Close();
             File.Delete("$temp");
         }
     }

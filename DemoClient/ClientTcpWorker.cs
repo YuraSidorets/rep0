@@ -35,7 +35,7 @@ namespace DemoClient
         private Dictionary<string, object> CreateDictToSendId(string id)
         {
             Dictionary<string, object> sendingContent = new Dictionary<string, object>();
-            sendingContent.Add("Command", "Upload");
+            sendingContent.Add("Command", "Download");
             sendingContent.Add("Id", id);
             return sendingContent;
         }

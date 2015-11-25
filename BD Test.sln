@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB Test", "BD Test\DB Test.csproj", "{5C237727-7406-46F3-91EB-4BDFE87AC40B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4739E232-3767-4A07-AAE6-41B4BB592AE9} = {4739E232-3767-4A07-AAE6-41B4BB592AE9}
+		{25FD197B-14B6-47F7-9398-F2DBE7B329B3} = {25FD197B-14B6-47F7-9398-F2DBE7B329B3}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoClient", "DemoClient\DemoClient.csproj", "{4739E232-3767-4A07-AAE6-41B4BB592AE9}"
 EndProject
